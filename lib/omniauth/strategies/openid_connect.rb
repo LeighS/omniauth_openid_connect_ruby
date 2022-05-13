@@ -29,6 +29,7 @@ module OmniAuth
                               host: nil,
                               port: 443,
                               authorization_endpoint: '/authorize',
+                              discovery_endpoint: '',
                               token_endpoint: '/token',
                               userinfo_endpoint: '/userinfo',
                               jwks_uri: '/jwk',
@@ -95,7 +96,8 @@ module OmniAuth
       end
 
       def config
-        @config ||= ::OpenIDConnect::Discovery::Provider::Config.discover!(options.issuer)
+        # Updated to support passing in a custom discovery endpoint (This is required for identity providers that use query strings on discovery endpoints e.g. Azure AD B2C)
+        @config ||= ::OpenIDConnect::Discovery::Provider::Config.discover!(options.issuer, options.client_options.discovery_endpoint)
       end
 
       def request_phase
