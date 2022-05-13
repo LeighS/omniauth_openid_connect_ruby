@@ -32,6 +32,7 @@ module OmniAuth
                               discovery_endpoint: '',
                               token_endpoint: '/token',
                               userinfo_endpoint: '/userinfo',
+                              call_userinfo_endpoint: false,
                               jwks_uri: '/jwk',
                               end_session_endpoint: nil)
 
@@ -212,8 +213,11 @@ module OmniAuth
 
         if access_token.id_token
           decoded = decode_id_token(access_token.id_token).raw_attributes
-
-          @user_info = ::OpenIDConnect::ResponseObject::UserInfo.new access_token.userinfo!.raw_attributes.merge(decoded)
+          if options.client_options.call_userinfo_endpoint
+            @user_info = ::OpenIDConnect::ResponseObject::UserInfo.new access_token.userinfo!.raw_attributes.merge(decoded)
+          else
+            @user_info = ::OpenIDConnect::ResponseObject::UserInfo.new decoded
+          end
         else
           @user_info = access_token.userinfo!
         end
